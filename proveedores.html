@@ -8,24 +8,24 @@
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- Font Awesome -->
-  <link rel="stylesheet" href="../Atoms/plugins/fontawesome-free/css/all.min.css">
+  <link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
   <!-- Ionicons -->
   <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
   <!-- Tempusdominus Bbootstrap 4 -->
-  <link rel="stylesheet" href="../Atoms/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+  <link rel="stylesheet" href="../plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
   <!-- iCheck -->
-  <link rel="stylesheet" href="../Atoms/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+  <link rel="stylesheet" href="../plugins/icheck-bootstrap/icheck-bootstrap.min.css">
   <!-- DataTables -->
-  <link rel="stylesheet" href="../Atoms/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-  <link rel="stylesheet" href="../Atoms/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+  <link rel="stylesheet" href="../plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+  <link rel="stylesheet" href="../plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
   <!-- Theme style -->
-  <link rel="stylesheet" href="../Atoms/dist/css/adminlte.min.css">
+  <link rel="stylesheet" href="../dist/css/adminlte.min.css">
   <!-- overlayScrollbars -->
-  <link rel="stylesheet" href="../Atoms/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
+  <link rel="stylesheet" href="../plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
   <!-- Daterange picker -->
-  <link rel="stylesheet" href="../Atoms/plugins/daterangepicker/daterangepicker.css">
+  <link rel="stylesheet" href="../plugins/daterangepicker/daterangepicker.css">
   <!-- summernote -->
-  <link rel="stylesheet" href="../Atoms/plugins/summernote/summernote-bs4.css">
+  <link rel="stylesheet" href="../plugins/summernote/summernote-bs4.css">
   <!-- Google Font: Source Sans Pro -->
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
   <!-- FAVICON -->
@@ -47,13 +47,13 @@
           <a href="./" class="nav-link" hidden>Dashboard</a>
         </li>
         <li class="nav-item d-none d-sm-inline-block">
-          <a href="./Productos" class="nav-link" hidden>Productos</a>
+          <a href="./Productos.html" class="nav-link" hidden>Productos</a>
         </li>
         <li class="nav-item d-none d-sm-inline-block">
-          <a href="./Pagos" class="nav-link" hidden>Pagos</a>
+          <a href="./pagos.html" class="nav-link" hidden>Pagos</a>
         </li>
         <li class="nav-item d-none d-sm-inline-block">
-          <a href="./Remitos" class="nav-link" hidden>Remitos</a>
+          <a href="./remitos.html" class="nav-link" hidden>Remitos</a>
         </li>
       </ul>
 
@@ -106,14 +106,14 @@
               </a>
               <ul class="nav nav-treeview bg-navy pl-2">
                 <li class="nav-item">
-                  <a href="./Clientes" class="nav-link">
+                  <a href="./Clientes.html" class="nav-link">
                     <i class="far fa-check-circle nav-icon"></i>
                     <p>Registro</p>
                   </a>
                 </li>
 
                 <li class="nav-item" hidden>
-                  <a href="./PanelClientes" class="nav-link">
+                  <a href="./panelClientes.html" class="nav-link">
                     <i class="far fa-user nav-icon"></i>
                     <p>Panel Cliente</p>
                   </a>
@@ -121,38 +121,38 @@
               </ul>
             </li>
             <li class="nav-item">
-              <a href="./Proveedores" class="nav-link active">
+              <a href="./Proveedores.html" class="nav-link active">
                 <i class="fa fa-industry nav-icon"></i>
                 <p>Proveedores</p>
               </a>
             </li>
             <li class="nav-item">
-              <a href="./Productos" class="nav-link">
+              <a href="./Productos.html" class="nav-link">
                 <i class="fas fa-cash-register nav-icon"></i>
                 <p>Productos</p>
               </a>
             </li>
             <li class="nav-item">
-              <a href="./Compras" class="nav-link">
+              <a href="./compras.html" class="nav-link">
                 <i class="fa fa-shopping-cart nav-icon"></i>
                 <p>Compras</p>
               </a>
             </li>
             <li class="nav-item" hidden>
-              <a href="./Remitos" class="nav-link">
+              <a href="./remitos.html" class="nav-link">
                 <i class="fas fa-columns nav-icon"></i>
                 <p>Remitos</p>
               </a>
             </li>
             <li class="nav-item" hidden>
-              <a href="./Pagos" class="nav-link">
+              <a href="./pagos.html" class="nav-link">
                 <i class="fas fa-wallet nav-icon"></i>
                 <p>Pagos</p>
               </a>
             </li>
             <li class="nav-header">USUARIOS LEANIM</li>
             <li class="nav-item">
-              <a href="./Usuarios" class="nav-link">
+              <a href="./usuarios.html" class="nav-link">
                 <i class="nav-icon fas fa-user-shield"></i>
                 <p>ABM</p>
               </a>
@@ -276,17 +276,6 @@
                           <div class="form-group">
                             <label>Contacto</label>
                             <input type="text" class="form-control" placeholder="Ingrese el contacto" id="contacto">
-                          </div>
-                        </div>
-                        <div class="col-sm-3">
-                          <!-- text input -->
-                          <div class="form-group" hidden>
-                            <label>IIBB</label>
-                            <select class="form-control" id="iibb">
-                              <option value="IIBB 1">IIBB por defecto</option>
-                              <option value="IIBB 2">IIBB 2</option>
-                              <option value="IIBB 3">IIBB 3</option>
-                            </select>
                           </div>
                         </div>
                       </div>
@@ -453,17 +442,6 @@
                   <input type="text" class="form-control" placeholder="Ingrese el contacto" id="contactoEdit">
                 </div>
               </div>
-              <div class="col-sm-4">
-                <!-- text input -->
-                <div class="form-group" hidden>
-                  <label>IIBB</label>
-                  <select class="form-control" id="iibbEdit">
-                    <option value="IIBB 1">IIBB por defecto</option>
-                    <option value="IIBB 2">IIBB 2</option>
-                    <option value="IIBB 3">IIBB 3</option>
-                  </select>
-                </div>
-              </div>
             </div>
           </form>
         </div>
@@ -506,35 +484,45 @@
   </div>
 
   <!-- jQuery -->
-  <script src="../Atoms/plugins/jquery/jquery.min.js"></script>
+  <script src="../plugins/jquery/jquery.min.js"></script>
   <!-- jQuery UI 1.11.4 -->
-  <script src="../Atoms/plugins/jquery-ui/jquery-ui.min.js"></script>
+  <script src="../plugins/jquery-ui/jquery-ui.min.js"></script>
   <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
   <script>
     $.widget.bridge('uibutton', $.ui.button)
   </script>
   <!-- Bootstrap 4 -->
-  <script src="../Atoms/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
   <!-- DataTables -->
-  <script src="../Atoms/plugins/datatables/jquery.dataTables.min.js"></script>
-  <script src="../Atoms/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-  <script src="../Atoms/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
-  <script src="../Atoms/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+  <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
+  <script src="../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+  <script src="../plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+  <script src="../plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
   <!-- daterangepicker -->
-  <script src="../Atoms/plugins/moment/moment.min.js"></script>
-  <script src="../Atoms/plugins/daterangepicker/daterangepicker.js"></script>
+  <script src="../plugins/moment/moment.min.js"></script>
+  <script src="../plugins/daterangepicker/daterangepicker.js"></script>
   <!-- Tempusdominus Bootstrap 4 -->
-  <script src="../Atoms/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
+  <script src="../plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
   <!-- Summernote -->
-  <script src="../Atoms/plugins/summernote/summernote-bs4.min.js"></script>
+  <script src="../plugins/summernote/summernote-bs4.min.js"></script>
   <!-- overlayScrollbars -->
-  <script src="../Atoms/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
+  <script src="../plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
   <!-- AdminLTE App -->
-  <script src="../Atoms/dist/js/adminlte.js"></script>
+  <script src="../dist/js/adminlte.js"></script>
   <!-- AdminLTE for demo purposes -->
-  <script src="../Atoms/dist/js/demo.js"></script>
-  <script src="../Atoms/proveedores.js"></script>
-  <script src="../Atoms/session.js"></script>
+  <script src="../dist/js/demo.js"></script>
+  <script src="../Proveedores.html2.js"></script>
+  <script src="../session.js"></script>
+  <!-- firebase -->
+  <!-- The core Firebase JS SDK is always required and must be listed first -->
+  <script defer src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
+  <!-- firebase auth -->
+  <script defer src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/8.0.1/firebase-firestore.js"></script>
+  <!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+  <script defer src="https://www.gstatic.com/firebasejs/8.0.1/firebase-analytics.js"></script>
+  <script defer src="./fbconfig.js"></script>
 </body>
 
 </html>

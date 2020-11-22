@@ -1,5 +1,7 @@
-var formProveedor = document.getElementById('formProveedor');
-var idEditable = 0;
+const formProveedor = document.getElementById('formProveedor');
+const lista = document.getElementById("tipo");
+const listaEdit = document.getElementById("tipoEdit");
+let idEditable = 0;
 
 formProveedor.addEventListener("submit", function (e) {
   altaProveedor();
@@ -8,61 +10,45 @@ formProveedor.addEventListener("submit", function (e) {
 
 $(window).on("load", function () {
   uploadTable();
-  listarTipoProveedores();
-});
+  listarTipoProveedores(lista);
+  listarTipoProveedores(listaEdit);
+})
 
-function altaProveedor() {
-  var jsonData = {
+async function altaProveedor() {
+  let jsonProveedor = {
     Nombre: document.getElementById('proveedor').value,
     RazonSocial: document.getElementById('razonSocial').value,
-    Cuit: document.getElementById('cuit').value.toString(),
+    Cuit: document.getElementById('cuit').value,
     Direccion: document.getElementById('direccion').value,
     Localidad: document.getElementById('localidad').value,
-    Telefono: document.getElementById('tel').value.toString(),
+    Telefono: document.getElementById('tel').value,
     TipoRubro: document.getElementById('tipo').value,
     Contacto: document.getElementById('contacto').value,
     CondicionFiscal: document.getElementById('condicionFiscal').value,
-    IIBB: document.getElementById('iibb').value,
-  };
+  }
 
-  var req = $.ajax({
-    url: 'http://leanim.switchit.com.ar/OperacionProveedores/IngresarNuevoProveedor',
-    type: "POST",
-    data: JSON.stringify(jsonData),
-    contentType: "application/json"
-  });
-
-  req.done(function () {
-    uploadTable();
-    document.getElementById('formProveedor').reset();
-  });
-
-  req.fail(function (err) {
-    console.log(err);
-  });
+  await db.collection('proveedores').doc().set(jsonProveedor)
+    .then(() => {
+      uploadTable();
+      formProveedor.reset();
+    })
+    .catch(err => {
+      console.error(err);
+    })
 }
 
-function mostrarProveedor(idProveedor) {
-  var req = $.ajax({
-    url: 'http://leanim.switchit.com.ar/OperacionProveedores/ObtenerProveedor',
-    type: "GET",
-    data: {
-      id: idProveedor
-    },
-    contentType: "application/json"
-  });
-
-  req.done(function (res) {
-    completarModal(res);
-    $('#modalEdit').modal('show');
-  });
-
-  req.fail(function (err) {
-    console.log(err);
-  });
+function mostrarProveedor(id) {
+  db.collection('proveedores').doc(id.toString()).get()
+    .then(doc => {
+      completarModal(doc.data(), id)
+      $('#modalEdit').modal('show')
+    })
+    .catch(error => {
+      console.error(error)
+    })
 }
 
-function completarModal(data) {
+function completarModal(data, id) {
   document.getElementById('proveedorEdit').value = data.Nombre;
   document.getElementById('razonSocialEdit').value = data.RazonSocial;
   document.getElementById('cuitEdit').value = data.Cuit;
@@ -72,39 +58,28 @@ function completarModal(data) {
   document.getElementById('tipoEdit').value = data.TipoRubro;
   document.getElementById('contactoEdit').value = data.Contacto;
   document.getElementById('condicionFiscalEdit').value = data.CondicionFiscal;
-  document.getElementById('iibbEdit').value = data.IIBB;
-  idEditable = data.ProveedorId;
+  idEditable = id;
 }
 
-function editarProveedor() {
-  var jsonData = {
-    ProveedorId: idEditable,
+async function editarProveedor() {
+  let jsonEditado = {
     Nombre: document.getElementById('proveedorEdit').value,
     RazonSocial: document.getElementById('razonSocialEdit').value,
-    Cuit: document.getElementById('cuitEdit').value.toString(),
+    Cuit: document.getElementById('cuitEdit').value,
     Direccion: document.getElementById('direccionEdit').value,
     Localidad: document.getElementById('localidadEdit').value,
-    Telefono: document.getElementById('telEdit').value.toString(),
+    Telefono: document.getElementById('telEdit').value,
     TipoRubro: document.getElementById('tipoEdit').value,
     Contacto: document.getElementById('contactoEdit').value,
     CondicionFiscal: document.getElementById('condicionFiscalEdit').value,
-    IIBB: document.getElementById('iibbEdit').value,
-  };
-
-  var req = $.ajax({
-    url: 'http://leanim.switchit.com.ar/OperacionProveedores/EditarProveedor',
-    type: "POST",
-    data: JSON.stringify(jsonData),
-    contentType: "application/json"
-  });
-
-  req.done(function () {
-    uploadTable();
-  });
-
-  req.fail(function (err) {
-    console.log(err);
-  });
+  }
+  await db.collection('proveedores').doc(idEditable).update(jsonEditado)
+    .then(() => {
+      uploadTable()
+    })
+    .catch(err => {
+      console.error(err);
+    })
 }
 
 function preguntaBorrar(idProveedor, nombre) {
@@ -117,99 +92,84 @@ function preguntaBorrar(idProveedor, nombre) {
   }, 4000);
 }
 
-function eliminarProveedor() {
+async function eliminarProveedor() {
   let id = document.getElementById('idBorrar').value;
-
-  var req = $.ajax({
-    url: 'http://leanim.switchit.com.ar/OperacionProveedores/EliminarProveedor?id=' + id,
-    type: "POST",
-  });
-
-  req.done(function () {
-    uploadTable();
-    document.getElementById('idBorrar').value = '';
-    document.getElementById('borrarBtn').setAttribute('disabled', 'disabled');
-  });
-
-  req.fail(function (err) {
-    console.log(err);
-  });
+  await db.collection('proveedores').doc(id).delete()
+    .then(() => {
+      uploadTable();
+      document.getElementById('idBorrar').value = ''
+      document.getElementById('borrarBtn').setAttribute('disabled', 'disabled')
+    })
+    .catch(err => {
+      console.error(err);
+    })
 }
 
-function listarTipoProveedores() {
-  var lista = document.getElementById("tipo");
-  var listaEdit = document.getElementById("tipoEdit");
-  var tabla = $.ajax({
-    url: 'http://leanim.switchit.com.ar/OperacionTiposRubro/ObtenerTipos',
-    type: "GET",
-    data: {},
-    contentType: "application/json"
-  });
-
-  tabla.done(function (res) {
-    res.forEach(element => {
-      var tipoRubro = document.createElement('option');
-      tipoRubro.appendChild(document.createTextNode(element.Nombre));
-      tipoRubro.value = element.Nombre;
-      lista.appendChild(tipoRubro);
-    });
-    res.forEach(element => {
-      var tipoRubro = document.createElement('option');
-      tipoRubro.appendChild(document.createTextNode(element.Nombre));
-      tipoRubro.value = element.Nombre;
-      listaEdit.appendChild(tipoRubro);
-    });
-  });
-
-  tabla.fail(function (err) {
-    console.log(err)
-  });
+function listarTipoProveedores(lista) {
+  const listar = data => {
+    if (data.length) {
+      data.forEach(doc => {
+        const tipo = doc.data()
+        let tipoRubro = document.createElement('option');
+        tipoRubro.appendChild(document.createTextNode(tipo.Nombre));
+        tipoRubro.value = tipo.Nombre;
+        lista.appendChild(tipoRubro);
+      });
+    }
+  }
+  db.collection('tipoProveedores').get()
+    .then((snapshot) => {
+      listar(snapshot.docs)
+    })
+    .catch(err => {
+      console.error(err);
+    })
 }
-
 
 function uploadTable() {
-
-  var tabla = $.ajax({
-    url: 'http://leanim.switchit.com.ar/OperacionProveedores/ObtenerProveedores',
-    type: "GET",
-    data: {},
-    contentType: "application/json"
-  });
-
-  tabla.done(function (res) {
-    $('#tablaProveedores').DataTable().clear().destroy();
-    $('#tablaProveedores').DataTable({
-      pageLength: 25,
-      data: res,
-      columns: [{
-          "data": "Nombre"
-        },
-        {
-          "data": "RazonSocial"
-        },
-        {
-          "data": "Cuit"
-        },
-        {
-          "data": "Telefono"
-        },
-        {
-          "data": "Localidad"
-        },
-        {
-          "data": "ProveedorId",
-          "data": "Nombre",
-          "data": function (data, type, row) {
-            return `
-            <a class="btn btn-sm btn-danger" href="#" onclick="preguntaBorrar(${data.ProveedorId}, '${data.Nombre}')">Borrar <i class="far fa-trash-alt" ></i></a>
-            <a class="btn btn-sm btn-warning" href="#" onclick="mostrarProveedor(${data.ProveedorId})">Modificar <i class="fa fa-edit" ></i></a>`;
+  let datos = []
+  db.collection('proveedores').get()
+    .then(snapshot => {
+      snapshot.docs.forEach(doc => {
+        const proveedor = doc.data()
+        proveedor.ProveedorId = doc.id
+        datos.push(proveedor)
+      })
+    })
+    .then(() => {
+      $('#tablaProveedores').DataTable().clear().destroy();
+      $('#tablaProveedores').DataTable({
+        pageLength: 25,
+        data: datos,
+        columns: [{
+            "data": "Nombre"
+          },
+          {
+            "data": "RazonSocial"
+          },
+          {
+            "data": "Cuit"
+          },
+          {
+            "data": "Telefono"
+          },
+          {
+            "data": "Localidad"
+          },
+          {
+            "data": "ProveedorId",
+            "data": "Nombre",
+            "data": function (data, type, row) {
+              return `
+              <a class="btn btn-sm btn-danger" href="#" onclick="preguntaBorrar('${data.ProveedorId}', '${data.Nombre}')">Borrar <i class="far fa-trash-alt" ></i></a>
+              <a class="btn btn-sm btn-warning" href="#" onclick="mostrarProveedor('${data.ProveedorId}')">Modificar <i class="fa fa-edit" ></i></a>`;
+            }
           }
-        }
-      ]
-    });
-  });
+        ]
+      })
+    })
+    .catch(error => {
+      console.error(error)
+    })
 
-  tabla.fail(function (err) {
-    console.log("fail" + err);
-  });
 }
