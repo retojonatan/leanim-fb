@@ -576,7 +576,7 @@ function uploadTable() {
             "data": function (data, type, row) {
               return `
             <a class="btn btn-sm btn-danger" href="#" onclick="preguntaBorrar('${data.CompraId}','${data.Proveedor}','${data.MontoTotal}')">Borrar <i class="far fa-trash-alt"></i></a>
-            <a class="btn btn-sm btn-warning" href="#" onclick="mostrarCompra('${data.CompraId}')">Modificar <i class="fa fa-edit"></i></a>`;
+            <a class="btn btn-sm btn-warning" href="#" hidden onclick="mostrarCompra('${data.CompraId}')">Modificar <i class="fa fa-edit"></i></a>`;
             }
           }
         ]
@@ -588,5 +588,28 @@ function uploadTable() {
 }
 
 function mostrarCompra(idCompra) {
-  console.log(idCompra)
+  db.collection('compras').doc(idCompra).get()
+    .then(compra => {
+      volcarDatos(compra.data())
+    })
+}
+
+function volcarDatos(compra) {
+  listaProveedores.value = compra.Proveedor
+  document.getElementById('razonSocial').value = compra.RazonSocial
+  document.getElementById('condicion').value = compra.CondicionFiscal
+  document.getElementById('tipo').value = compra.TipoProveedor
+  document.getElementById('numFc').value = compra.NumeroFactura
+  fechaFc.value = compra.FechaFactura
+  montoTotal.value = compra.MontoTotal
+  ivaTotal.value = compra.MontoTotalIVA
+  document.getElementById('cuit').value = compra.Cuit
+  comprobante.value = compra.TipoComprobante
+  document.getElementById('observaciones').value = compra.Observaciones
+  jsonProductos = compra.ListaProductosComprados
+  console.log(jsonProductos)
+
+  if (jsonProductos.length > 1) {
+    console.log('mas de 1 producto')
+  }
 }

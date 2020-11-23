@@ -1,104 +1,74 @@
-var idEditable,
-  debe,
-  haber,
-  cantidadVentas;
+const formClientes = document.getElementById('formClientes')
+let idEditable
 
 $(window).on("load", function () {
   uploadTable();
-  document.getElementById('formClientes').addEventListener('submit', function (e) {
-    registrarCliente();
-    e.preventDefault();
-  });
-});
+  formClientes.addEventListener('submit', function (e) {
+    registrarCliente()
+    e.preventDefault()
+  })
+})
 
 function registrarCliente() {
-  var jsonData = {
+  let jsonCliente = {
     Nombre: document.getElementById('nombre').value,
     Alias: document.getElementById('alias').value,
     Telefono: document.getElementById('tel').value,
     Direccion: document.getElementById('dir').value,
     Localidad: document.getElementById('localidad').value,
-    Debe: 0,
-    Haber: 0,
+    CtaCte: 0,
+    Deuda: 0,
+    ComprasAcumuladas: 0,
     CantidadVentas: 0,
-  };
+    Ventas: []
+  }
 
-  var req = $.ajax({
-    url: 'http://leanim.switchit.com.ar/OperacionClientes/IngresarNuevoCliente',
-    type: "POST",
-    data: JSON.stringify(jsonData),
-    contentType: "application/json"
-  });
-
-  req.done(function () {
-    uploadTable();
-    document.getElementById('formClientes').reset();
-  });
-
-  req.fail(function (err) {
-    console.log(err);
-  });
+  db.collection('clientes').doc().set(jsonCliente)
+    .then(() => {
+      uploadTable()
+      formClientes.reset()
+    })
+    .catch(err => {
+      console.log(err);
+    })
 }
 
 function mostrarCliente(clienteId) {
-  var req = $.ajax({
-    url: 'http://leanim.switchit.com.ar/OperacionClientes/ObtenerCliente',
-    type: "GET",
-    data: {
-      id: clienteId
-    },
-    contentType: "application/json"
-  });
-
-  req.done(function (res) {
-    completarModal(res);
-    $('#modalEdit').modal('show');
-  });
-
-  req.fail(function (err) {
-    console.log(err);
-  });
+  db.collection('clientes').doc(clienteId).get()
+    .then(doc => {
+      completarModal(doc.data(), clienteId)
+      $('#modalEdit').modal('show');
+    })
+    .catch(err => {
+      console.error(err)
+    })
 }
 
-function completarModal(data) {
-  document.getElementById('nombreEdit').value = data.Nombre;
-  document.getElementById('aliasEdit').value = data.Alias;
-  document.getElementById('telEdit').value = data.Telefono;
-  document.getElementById('dirEdit').value = data.Direccion;
-  document.getElementById('localidadEdit').value = data.Localidad;
-  idEditable = data.ClienteId;
-  debe = data.Debe;
-  haber = data.Haber;
-  cantidadVentas = data.CantidadVentas;
+function completarModal(data, clienteId) {
+  document.getElementById('nombreEdit').value = data.Nombre
+  document.getElementById('aliasEdit').value = data.Alias
+  document.getElementById('telEdit').value = data.Telefono
+  document.getElementById('dirEdit').value = data.Direccion
+  document.getElementById('localidadEdit').value = data.Localidad
+  idEditable = clienteId
 }
 
-function editarCliente() {
-  var jsonData = {
-    ClienteId: idEditable,
-    Debe: debe,
-    Haber: haber,
-    CantidadVentas: cantidadVentas,
+async function editarCliente() {
+  let jsonEditado = {
     Nombre: document.getElementById('nombreEdit').value,
     Alias: document.getElementById('aliasEdit').value,
     Telefono: document.getElementById('telEdit').value,
     Direccion: document.getElementById('dirEdit').value,
     Localidad: document.getElementById('localidadEdit').value,
-  };
+  }
+  await db.collection('clientes').doc(idEditable).update(jsonEditado)
+    .then(() => {
+      uploadTable()
+    })
+    .catch(err => {
+      console.error(err)
+    })
 
-  var req = $.ajax({
-    url: 'http://leanim.switchit.com.ar/OperacionClientes/EditarCliente',
-    type: "POST",
-    data: JSON.stringify(jsonData),
-    contentType: "application/json"
-  });
-
-  req.done(function () {
-    uploadTable();
-  });
-
-  req.fail(function (err) {
-    console.log(err);
-  });
 }
 
 function preguntaBorrar(idCliente, nombre) {
@@ -111,66 +81,60 @@ function preguntaBorrar(idCliente, nombre) {
   }, 4000);
 }
 
-function eliminarCliente() {
-  let id = document.getElementById('idBorrar').value;
-
-  var req = $.ajax({
-    url: 'http://leanim.switchit.com.ar/OperacionClientes/EliminarCliente?id=' + id,
-    type: "POST",
-  });
-
-  req.done(function () {
-    uploadTable();
-    document.getElementById('idBorrar').value = '';
-    document.getElementById('borrarBtn').setAttribute('disabled', 'disabled');
-  });
-
-  req.fail(function (err) {
-    console.log(err);
-  });
+async function eliminarCliente() {
+  let id = document.getElementById('idBorrar').value
+  await db.collection('clientes').doc(id).delete()
+    .then(() => {
+      uploadTable();
+      id.value = ''
+      document.getElementById('borrarBtn').setAttribute('disabled', 'disabled')
+    })
+    .catch(err => {
+      console.error(err);
+    })
 }
 
 function uploadTable() {
-
-  var tablaClientes = $.ajax({
-    url: 'http://leanim.switchit.com.ar/OperacionClientes/ObtenerClientes',
-    type: "GET",
-    data: {},
-    contentType: "application/json"
-  });
-
-  tablaClientes.done(function (res) {
-    $('#tablaClientes').DataTable().clear().destroy();
-    $('#tablaClientes').DataTable({
-      pageLength: 25,
-      data: res,
-      columns: [{
-          "data": "Nombre"
-        },
-        {
-          "data": "Alias"
-        },
-        {
-          "data": "Telefono"
-        },
-        {
-          "data": "Localidad"
-        },
-        {
-          "data": "ClienteId",
-          "data": "Nombre",
-          "data": function (data, type, row) {
-            return `<a href="./panelClientes.html" class="btn btn-sm btn-info">Acceder <i class="fa fa-user-cog"></i></a>
-            <a class="btn btn-sm btn-warning" href="#" onclick="mostrarCliente(${data.ClienteId})">Editar <i class="fa fa-edit" ></i></a>
-            <a class="btn btn-sm btn-danger" href="#" onclick="preguntaBorrar(${data.ClienteId}, '${data.Nombre}')">Borrar <i class="far fa-trash-alt" ></i></a>`;
+  let datos = []
+  db.collection('clientes').get()
+    .then(snapshot => {
+      snapshot.docs.forEach(doc => {
+        const cliente = doc.data()
+        cliente.ClienteId = doc.id
+        datos.push(cliente)
+      })
+    })
+    .then(() => {
+      $('#tablaClientes').DataTable().clear().destroy();
+      $('#tablaClientes').DataTable({
+        pageLength: 25,
+        data: datos,
+        columns: [{
+            "data": "Nombre"
+          },
+          {
+            "data": "Alias"
+          },
+          {
+            "data": "Telefono"
+          },
+          {
+            "data": "Localidad"
+          },
+          {
+            "data": "ClienteId",
+            "data": "Nombre",
+            "data": function (data, type, row) {
+              return `<a href="./panelClientes.html" class="btn btn-sm btn-info">Acceder <i class="fa fa-user-cog"></i></a>
+            <a class="btn btn-sm btn-warning" href="#" onclick="mostrarCliente('${data.ClienteId}')">Editar <i class="fa fa-edit" ></i></a>
+            <a class="btn btn-sm btn-danger" href="#" onclick="preguntaBorrar('${data.ClienteId}', '${data.Nombre}')">Borrar <i class="far fa-trash-alt" ></i></a>`;
+            }
           }
-        }
-      ]
-    });
-    document.getElementById('formClientes').reset();
-  });
-
-  tablaClientes.fail(function (err) {
-    console.log(err);
-  });
+        ]
+      });
+      formClientes.reset();
+    })
+    .catch(err => {
+      console.error(err)
+    })
 }
