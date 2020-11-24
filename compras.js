@@ -266,9 +266,8 @@ $(window).on("load", function () {
     limpiarFilasProductos(filaProducto);
   })
 
-  listaProductos.addEventListener('change', function (e) {
-    var opcionElegida = e.target.options.selectedIndex;
-    var productoId = e.srcElement[opcionElegida].id;
+  listaProductos.addEventListener('change', () => {
+    var productoId = listaProductos.selectedOptions[0].id
     presentarDatosProducto(productoId);
   })
 
@@ -494,33 +493,11 @@ async function listarProductos(lista, nombreProveedor) {
         productoOpcion.value = producto.Nombre;
         productoOpcion.id = producto.ProductoId;
         lista.appendChild(productoOpcion);
-      });
+      })
     })
     .catch(err => {
       console.error(err);
     })
-}
-
-function mostrarCompra(id) {
-  db.collection('compras').doc(id).get()
-    .then(doc => {
-      completarModal(doc.data(), id)
-      $('#modalEdit').modal('show');
-    })
-    .catch(err => {
-      console.error(err)
-    })
-}
-
-function completarModal(data, id) {
-  buscarRubros(data.TipoRubro);
-  document.getElementById('listaProveedoresEdit').value = data.TipoRubro;
-  document.getElementById('productoEdit').value = data.Nombre;
-  document.getElementById('marcaEdit').value = data.Marca;
-  document.getElementById('precioEdit').value = data.Precio;
-  document.getElementById('ivaEdit').value = data.IVA;
-  valorRubroEdit = data.Rubro;
-  idEditable = id;
 }
 
 // carga de la tabla de compras
@@ -576,7 +553,7 @@ function uploadTable() {
             "data": function (data, type, row) {
               return `
             <a class="btn btn-sm btn-danger" href="#" onclick="preguntaBorrar('${data.CompraId}','${data.Proveedor}','${data.MontoTotal}')">Borrar <i class="far fa-trash-alt"></i></a>
-            <a class="btn btn-sm btn-warning" href="#" hidden onclick="mostrarCompra('${data.CompraId}')">Modificar <i class="fa fa-edit"></i></a>`;
+            <a class="btn btn-sm btn-warning" hidden href="#" onclick="mostrarCompra('${data.CompraId}')">Modificar <i class="fa fa-edit"></i></a>`;
             }
           }
         ]
@@ -587,10 +564,58 @@ function uploadTable() {
     })
 }
 
+async function listarParaModificacion(lista, nombreProveedor, producto) {
+  $('#listaProductos').empty()
+  let datos = []
+  await db.collection('productos').where('Proveedor', "==", nombreProveedor)
+    .get()
+    .then(querysnapshot => {
+      querysnapshot.forEach(doc => {
+        const producto = doc.data()
+        producto.ProductoId = doc.id
+        datos.push(producto)
+      })
+    })
+    .then(() => {
+      datos.forEach(producto => {
+        let productoOpcion = document.createElement('option');
+        productoOpcion.appendChild(document.createTextNode(producto.Nombre));
+        productoOpcion.value = producto.Nombre;
+        productoOpcion.id = producto.ProductoId;
+        lista.appendChild(productoOpcion);
+      })
+      lista.value = producto
+    })
+    .catch(err => {
+      console.error(err);
+    })
+}
+
+let compraActual
+
 function mostrarCompra(idCompra) {
   db.collection('compras').doc(idCompra).get()
     .then(compra => {
-      volcarDatos(compra.data())
+      compraActual = compra.data()
+    })
+    .then(() => {
+      formCompras.reset()
+      while (count != 1) {
+        deleteProduct();
+      }
+      comprobante.value = compraActual.TipoComprobante
+      comprobante.dispatchEvent(new Event('change'))
+      limpiarFilasProductos(filaProducto)
+    })
+    .then(() => {
+      volcarDatos(compraActual)
+    })
+    .then(() => {
+      volcarProductos(compraActual.ListaProductosComprados)
+      listarParaModificacion(listaProductos, compraActual.Proveedor, compraActual.ListaProductosComprados[0].Producto)
+    })
+    .catch(err => {
+      console.error(err)
     })
 }
 
@@ -604,12 +629,31 @@ function volcarDatos(compra) {
   montoTotal.value = compra.MontoTotal
   ivaTotal.value = compra.MontoTotalIVA
   document.getElementById('cuit').value = compra.Cuit
-  comprobante.value = compra.TipoComprobante
   document.getElementById('observaciones').value = compra.Observaciones
-  jsonProductos = compra.ListaProductosComprados
-  console.log(jsonProductos)
+}
 
-  if (jsonProductos.length > 1) {
-    console.log('mas de 1 producto')
+function volcarProductos(productos) {
+  for (let i = 0; i < productos.length; i++) {
+    let productoActual = productos[i]
+    if (i > 0) {
+      addProduct()
+      document.getElementById('listaProductos' + i).value = productoActual.Producto
+      document.getElementById('marca' + i).value = productoActual.Marca
+      document.getElementById('precio' + i).value = productoActual.Precio
+      document.getElementById('cantidad' + i).value = productoActual.Cantidad
+      document.getElementById('subtotal' + i).value = productoActual.Subtotal
+      document.getElementById('iva' + i).value = productoActual.PorcentajeIVA
+      document.getElementById('ivaPesos' + i).value = productoActual.MontoIVA
+      document.getElementById('precioBruto' + i).value = productoActual.PrecioBruto
+    } else {
+      listaProductos.value = productoActual.Producto
+      marca.value = productoActual.Marca
+      precio.value = productoActual.Precio
+      cantidad.value = productoActual.Cantidad
+      subtotal.value = productoActual.Subtotal
+      iva.value = productoActual.PorcentajeIVA
+      ivaPesos.value = productoActual.MontoIVA
+      precioBruto.value = productoActual.PrecioBruto
+    }
   }
 }
