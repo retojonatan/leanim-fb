@@ -187,6 +187,10 @@ comprobante.addEventListener('change', function (e) {
       opcion5.appendChild(document.createTextNode('0%'));
       opcion5.value = 0;
       iva.appendChild(opcion5);
+      var opcion6 = document.createElement('option');
+      opcion6.appendChild(document.createTextNode('Percepcion RG2408'));
+      opcion6.value = 100;
+      iva.appendChild(opcion6);
       calcularIva();
       break;
       // case 'Fc B':
@@ -553,7 +557,7 @@ function uploadTable() {
             "data": function (data, type, row) {
               return `
             <a class="btn btn-sm btn-danger" href="#" onclick="preguntaBorrar('${data.CompraId}','${data.Proveedor}','${data.MontoTotal}')">Borrar <i class="far fa-trash-alt"></i></a>
-            <a class="btn btn-sm btn-warning" hidden href="#" onclick="mostrarCompra('${data.CompraId}')">Modificar <i class="fa fa-edit"></i></a>`;
+            <a class="btn btn-sm btn-warning" href="#" onclick="mostrarCompra('${data.CompraId}')">Modificar <i class="fa fa-edit"></i></a>`;
             }
           }
         ]
