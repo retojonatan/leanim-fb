@@ -105,7 +105,10 @@ function calcularIva() {
     let porcentaje = parseFloat(iva.value / 100);
     ivaPesos.value = (precio.value * porcentaje).toFixed(2);
     if (comprobante.value == "Fc A") {
-      precioBruto.value = parseFloat(parseFloat(precio.value) + parseFloat(ivaPesos.value)).toFixed(2);
+      if (porcentaje == 1) precioBruto.value = parseFloat(ivaPesos.value).toFixed(2)
+      else {
+        precioBruto.value = parseFloat(parseFloat(precio.value) + parseFloat(ivaPesos.value)).toFixed(2);
+      }
     } else {
       precioBruto.value = precio.value;
     }
@@ -113,8 +116,10 @@ function calcularIva() {
       porcentaje = document.getElementById('iva' + i).value / 100;
       document.getElementById('ivaPesos' + i).value = (document.getElementById('precio' + i).value * porcentaje).toFixed(2);
       if (comprobante.value == "Fc A") {
-        document.getElementById('precioBruto' + i).value = parseFloat(parseFloat(document.getElementById('precio' + i).value) + parseFloat(document.getElementById('ivaPesos' + i).value)).toFixed(2);
-
+        if (porcentaje == 1) document.getElementById('precioBruto' + i).value = parseFloat(document.getElementById('ivaPesos' + i).value).toFixed(2)
+        else {
+          document.getElementById('precioBruto' + i).value = parseFloat(parseFloat(document.getElementById('precio' + i).value) + parseFloat(document.getElementById('ivaPesos' + i).value)).toFixed(2);
+        }
       } else {
         document.getElementById('precioBruto' + i).value = document.getElementById('precio' + i).value;
       }
@@ -158,6 +163,13 @@ function calcularMontoTotal() {
   }
 }
 
+listaProductos.addEventListener('click', e => {
+  if (!comprobante.value) {
+    toastr.error('elegir comprobante')
+    comprobante.focus()
+  }
+})
+
 comprobante.addEventListener('change', function (e) {
   // limpia la lista de opciones anteriores de iva
   while (iva.childElementCount != 0) {
@@ -193,38 +205,6 @@ comprobante.addEventListener('change', function (e) {
       iva.appendChild(opcion6);
       calcularIva();
       break;
-      // case 'Fc B':
-      //   var opcion = document.createElement('option');
-      //   opcion.appendChild(document.createTextNode('21%'));
-      //   opcion.value = 21;
-      //   opcion.setAttribute('selected', 'selected');
-      //   iva.appendChild(opcion);
-      //   calcularIva();
-      //   break;
-      // case 'Fc C':
-      //   var opcion = document.createElement('option');
-      //   opcion.appendChild(document.createTextNode('21%'));
-      //   opcion.value = 21;
-      //   opcion.setAttribute('selected', 'selected');
-      //   iva.appendChild(opcion);
-      //   calcularIva();
-      //   break;
-      // case 'Ticket':
-      //   var opcion = document.createElement('option');
-      //   opcion.appendChild(document.createTextNode('21%'));
-      //   opcion.value = 21;
-      //   opcion.setAttribute('selected', 'selected');
-      //   iva.appendChild(opcion);
-      //   calcularIva();
-      //   break;
-      // case 'S/C':
-      //   var opcion = document.createElement('option');
-      //   opcion.appendChild(document.createTextNode('0%'));
-      //   opcion.value = 0;
-      //   opcion.setAttribute('selected', 'selected');
-      //   iva.appendChild(opcion);
-      //   calcularIva();
-      //   break;
     default:
       var opcion = document.createElement('option');
       opcion.appendChild(document.createTextNode('0%'));
@@ -258,28 +238,24 @@ $(window).on("load", function () {
   precio.addEventListener('change', function () {
     calcularIva();
     calcularSubtotal();
-  });
+  })
   formCompras.addEventListener("submit", function (e) {
     altaCompra();
     e.preventDefault();
-  });
-
+  })
   listaProveedores.addEventListener('change', function (e) {
     presentarDatosProveedor(e.target.selectedOptions[0].getAttribute('data-id'));
     listarProductos(listaProductos, e.target.value);
     limpiarFilasProductos(filaProducto);
   })
-
   listaProductos.addEventListener('change', () => {
     var productoId = listaProductos.selectedOptions[0].id
     presentarDatosProducto(productoId);
   })
-
   iva.addEventListener('change', function () {
     calcularIva();
     calcularSubtotal();
   })
-
   cantidad.addEventListener('change', function () {
     calcularSubtotal();
     calcularMontoTotal();
@@ -595,9 +571,9 @@ async function listarParaModificacion(lista, nombreProveedor, producto) {
     })
 }
 
-let compraActual
 
 function mostrarCompra(idCompra) {
+  let compraActual
   db.collection('compras').doc(idCompra).get()
     .then(compra => {
       compraActual = compra.data()
@@ -623,8 +599,17 @@ function mostrarCompra(idCompra) {
     })
 }
 
+HTMLSelectElement.prototype.contains = function (value) {
+  for (let i = 0, l = this.options.length; i < l; i++) {
+    if (this.options[i].value == value) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function volcarDatos(compra) {
-  listaProveedores.value = compra.Proveedor
+  (listaProveedores.contains(compra.Proveedor)) ? listaProveedores.value = compra.Proveedor: toastr.error('El proveedor de la compra: "' + compra.Proveedor + '" no fue encontrado en la base de datos')
   document.getElementById('razonSocial').value = compra.RazonSocial
   document.getElementById('condicion').value = compra.CondicionFiscal
   document.getElementById('tipo').value = compra.TipoProveedor
