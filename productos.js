@@ -1,28 +1,28 @@
-const formProductos = document.getElementById('formProductos');
-const listaProveedores = document.getElementById('listaProveedores');
-const listaProveedoresEdit = document.getElementById('listaProveedoresEdit');
-const listaRubro = document.getElementById("rubro");
-const listaRubroEdit = document.getElementById("rubroEdit");
-let valorRubroEdit = "";
-let idEditable = 0;
+const formProductos = document.getElementById('formProductos')
+const listaProveedores = document.getElementById('listaProveedores')
+const listaProveedoresEdit = document.getElementById('listaProveedoresEdit')
+const listaRubro = document.getElementById("rubro")
+const listaRubroEdit = document.getElementById("rubroEdit")
+let valorRubroEdit = ""
+let idEditable = 0
 
 formProductos.addEventListener("submit", function (e) {
-  altaProducto();
-  e.preventDefault();
+  altaProducto()
+  e.preventDefault()
 })
 
 listaProveedores.addEventListener("change", function (e) {
-  buscarRubros(e.target.value);
+  buscarRubros(e.target.value)
 })
 
 listaProveedoresEdit.addEventListener("change", function (e) {
-  buscarRubros(e.target.value);
+  buscarRubros(e.target.value)
 })
 
 $(window).on("load", function () {
-  uploadTable();
-  listarProveedores(listaProveedores);
-  listarProveedores(listaProveedoresEdit);
+  uploadTable()
+  listarProveedores(listaProveedores)
+  listarProveedores(listaProveedoresEdit)
 })
 
 async function altaProducto() {
@@ -38,11 +38,11 @@ async function altaProducto() {
 
   await db.collection('productos').doc().set(jsonProducto)
     .then(() => {
-      uploadTable();
-      formProductos.reset();
+      uploadTable()
+      formProductos.reset()
     })
     .catch(err => {
-      console.error(err);
+      console.error(err)
     })
 }
 
@@ -51,14 +51,14 @@ async function listarProveedores(lista) {
     .then(docs => {
       docs.forEach(querysnapshot => {
         let doc = querysnapshot.data()
-        let proveedor = document.createElement('option');
-        proveedor.appendChild(document.createTextNode(doc.Nombre));
-        proveedor.value = doc.TipoRubro;
-        lista.appendChild(proveedor);
+        let proveedor = document.createElement('option')
+        proveedor.appendChild(document.createTextNode(doc.Nombre))
+        proveedor.value = doc.TipoRubro
+        lista.appendChild(proveedor)
       })
     })
     .catch(err => {
-      console.error(err);
+      console.error(err)
     })
 }
 
@@ -66,7 +66,7 @@ function mostrarProducto(id) {
   db.collection('productos').doc(id).get()
     .then(doc => {
       completarModal(doc.data(), id)
-      $('#modalEdit').modal('show');
+      $('#modalEdit').modal('show')
     })
     .catch(err => {
       console.error(err)
@@ -74,14 +74,14 @@ function mostrarProducto(id) {
 }
 
 function completarModal(data, id) {
-  buscarRubros(data.TipoRubro);
-  document.getElementById('listaProveedoresEdit').value = data.TipoRubro;
-  document.getElementById('productoEdit').value = data.Nombre;
-  document.getElementById('marcaEdit').value = data.Marca;
-  document.getElementById('precioEdit').value = data.Precio;
-  document.getElementById('ivaEdit').value = data.IVA;
-  valorRubroEdit = data.Rubro;
-  idEditable = id;
+  buscarRubros(data.TipoRubro)
+  document.getElementById('listaProveedoresEdit').value = data.TipoRubro
+  document.getElementById('productoEdit').value = data.Nombre
+  document.getElementById('marcaEdit').value = data.Marca
+  document.getElementById('precioEdit').value = data.Precio
+  document.getElementById('ivaEdit').value = data.IVA
+  valorRubroEdit = data.Rubro
+  idEditable = id
 }
 
 function limpiarRubro(lista) {
@@ -129,46 +129,45 @@ async function buscarRubros(tipoProveedor) {
 }
 
 function filtrarRubros(rubros) {
-  limpiarRubro(listaRubro);
+  limpiarRubro(listaRubro)
   rubros.forEach(rubro => {
-    let opcionRubro = document.createElement('option');
-    opcionRubro.appendChild(document.createTextNode(rubro.Nombre));
-    opcionRubro.value = rubro.Nombre;
-    listaRubro.appendChild(opcionRubro);
-  });
-  limpiarRubro(listaRubroEdit);
+    let opcionRubro = document.createElement('option')
+    opcionRubro.appendChild(document.createTextNode(rubro.Nombre))
+    opcionRubro.value = rubro.Nombre
+    listaRubro.appendChild(opcionRubro)
+  })
+  limpiarRubro(listaRubroEdit)
   rubros.forEach(rubro => {
-    let opcionRubro = document.createElement('option');
-    opcionRubro.appendChild(document.createTextNode(rubro.Nombre));
-    opcionRubro.value = rubro.Nombre;
-    listaRubroEdit.appendChild(opcionRubro);
+    let opcionRubro = document.createElement('option')
+    opcionRubro.appendChild(document.createTextNode(rubro.Nombre))
+    opcionRubro.value = rubro.Nombre
+    listaRubroEdit.appendChild(opcionRubro)
   });
-  listaRubroEdit.value = valorRubroEdit;
+  listaRubroEdit.value = valorRubroEdit
 }
 
 function preguntaBorrar(idProducto, nombre) {
-  document.getElementById('modalDel').innerHTML = `Se está eliminando el producto: <b>${nombre}</b>`;
-  document.getElementById('idBorrar').value = idProducto;
-  $('#modalBorrar').modal('show');
+  document.getElementById('modalDel').innerHTML = `Se está eliminando el producto: <b>${nombre}</b>`
+  document.getElementById('idBorrar').value = idProducto
+  $('#modalBorrar').modal('show')
   setTimeout(function () {
-    document.getElementById('borrarBtn').removeAttribute('disabled');
-    document.getElementById('borrarBtn').innerHTML = 'ELIMINAR';
+    document.getElementById('borrarBtn').removeAttribute('disabled')
+    document.getElementById('borrarBtn').innerHTML = 'ELIMINAR'
   }, 4000);
 }
 
 async function eliminarProducto() {
-  let id = document.getElementById('idBorrar').value;
+  let id = document.getElementById('idBorrar').value
   await db.collection('productos').doc(id).delete()
     .then(() => {
-      uploadTable();
+      uploadTable()
       id.value = ''
       document.getElementById('borrarBtn').setAttribute('disabled', 'disabled')
     })
     .catch(err => {
-      console.error(err);
+      console.error(err)
     })
 }
-
 
 function uploadTable() {
   let datos = []

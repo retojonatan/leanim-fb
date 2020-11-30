@@ -103,22 +103,22 @@ function esconderDelete() {
 function calcularIva() {
   for (let i = 0; i < count; i++) {
     let porcentaje = parseFloat(iva.value / 100);
-    ivaPesos.value = (precio.value * porcentaje).toFixed(2);
+    ivaPesos.value = (precio.value * porcentaje).toFixed(4);
     if (comprobante.value == "Fc A") {
-      if (porcentaje == 1) precioBruto.value = parseFloat(ivaPesos.value).toFixed(2)
+      if (porcentaje == 1) precioBruto.value = parseFloat(ivaPesos.value).toFixed(4)
       else {
-        precioBruto.value = parseFloat(parseFloat(precio.value) + parseFloat(ivaPesos.value)).toFixed(2);
+        precioBruto.value = parseFloat(parseFloat(precio.value) + parseFloat(ivaPesos.value)).toFixed(4);
       }
     } else {
       precioBruto.value = precio.value;
     }
     if (i != 0) {
       porcentaje = document.getElementById('iva' + i).value / 100;
-      document.getElementById('ivaPesos' + i).value = (document.getElementById('precio' + i).value * porcentaje).toFixed(2);
+      document.getElementById('ivaPesos' + i).value = (document.getElementById('precio' + i).value * porcentaje).toFixed(4);
       if (comprobante.value == "Fc A") {
-        if (porcentaje == 1) document.getElementById('precioBruto' + i).value = parseFloat(document.getElementById('ivaPesos' + i).value).toFixed(2)
+        if (porcentaje == 1) document.getElementById('precioBruto' + i).value = parseFloat(document.getElementById('ivaPesos' + i).value).toFixed(4)
         else {
-          document.getElementById('precioBruto' + i).value = parseFloat(parseFloat(document.getElementById('precio' + i).value) + parseFloat(document.getElementById('ivaPesos' + i).value)).toFixed(2);
+          document.getElementById('precioBruto' + i).value = parseFloat(parseFloat(document.getElementById('precio' + i).value) + parseFloat(document.getElementById('ivaPesos' + i).value)).toFixed(4);
         }
       } else {
         document.getElementById('precioBruto' + i).value = document.getElementById('precio' + i).value;
@@ -131,11 +131,11 @@ function calcularIva() {
 function calcularSubtotal() {
   for (let i = 0; i < count; i++) {
     if (i == 0) {
-      subtotal.value = parseFloat(parseFloat(precioBruto.value) * parseFloat(cantidad.value)).toFixed(2);
+      subtotal.value = parseFloat(parseFloat(precioBruto.value) * parseFloat(cantidad.value)).toFixed(4);
     } else {
       let precioBrutoProd = document.getElementById('precioBruto' + i);
       let cantidadProd = document.getElementById('cantidad' + i);
-      document.getElementById('subtotal' + i).value = parseFloat(parseFloat(precioBrutoProd.value) * parseFloat(cantidadProd.value)).toFixed(2);
+      document.getElementById('subtotal' + i).value = parseFloat(parseFloat(precioBrutoProd.value) * parseFloat(cantidadProd.value)).toFixed(4);
     }
   }
   calcularIvaTotal();
@@ -144,10 +144,10 @@ function calcularSubtotal() {
 function calcularIvaTotal() {
   for (let i = 0; i < count; i++) {
     if (i == 0) {
-      ivaTotal.value = parseFloat(parseFloat(ivaPesos.value) * parseFloat(cantidad.value)).toFixed(2);
+      ivaTotal.value = parseFloat(parseFloat(ivaPesos.value) * parseFloat(cantidad.value)).toFixed(4);
     } else {
-      ivaProducto = parseFloat(parseFloat(document.getElementById('ivaPesos' + i).value) * parseFloat(document.getElementById('cantidad' + i).value)).toFixed(2);
-      ivaTotal.value = parseFloat(parseFloat(ivaProducto) + parseFloat(ivaTotal.value)).toFixed(2);
+      ivaProducto = parseFloat(parseFloat(document.getElementById('ivaPesos' + i).value) * parseFloat(document.getElementById('cantidad' + i).value)).toFixed(4);
+      ivaTotal.value = parseFloat(parseFloat(ivaProducto) + parseFloat(ivaTotal.value)).toFixed(4);
     }
   }
   calcularMontoTotal();
@@ -158,7 +158,7 @@ function calcularMontoTotal() {
     if (i == 0) montoTotal.value = parseFloat(precioBruto.value) * parseFloat(cantidad.value);
     else {
       let totales = parseFloat(document.getElementById('precioBruto' + i).value) * parseFloat(document.getElementById('cantidad' + i).value);
-      montoTotal.value = parseFloat(parseFloat(montoTotal.value) + parseFloat(totales)).toFixed(2);
+      montoTotal.value = parseFloat(parseFloat(montoTotal.value) + parseFloat(totales)).toFixed(4);
     }
   }
 }
@@ -544,60 +544,64 @@ function uploadTable() {
     })
 }
 
-async function listarParaModificacion(lista, nombreProveedor, producto) {
-  $('#listaProductos').empty()
-  let datos = []
-  await db.collection('productos').where('Proveedor', "==", nombreProveedor)
+function mostrarCompra(id) {
+  db.collection('compras').doc(id)
     .get()
-    .then(querysnapshot => {
-      querysnapshot.forEach(doc => {
-        const producto = doc.data()
-        producto.ProductoId = doc.id
-        datos.push(producto)
-      })
-    })
-    .then(() => {
-      datos.forEach(producto => {
-        let productoOpcion = document.createElement('option');
-        productoOpcion.appendChild(document.createTextNode(producto.Nombre));
-        productoOpcion.value = producto.Nombre;
-        productoOpcion.id = producto.ProductoId;
-        lista.appendChild(productoOpcion);
-      })
-      lista.value = producto
-    })
-    .catch(err => {
-      console.error(err);
-    })
-}
-
-
-function mostrarCompra(idCompra) {
-  let compraActual
-  db.collection('compras').doc(idCompra).get()
     .then(compra => {
-      compraActual = compra.data()
-    })
-    .then(() => {
+      let compraActual = compra.data()
       formCompras.reset()
       while (count != 1) {
-        deleteProduct();
+        deleteProduct()
       }
-      comprobante.value = compraActual.TipoComprobante
-      comprobante.dispatchEvent(new Event('change'))
-      limpiarFilasProductos(filaProducto)
+      return compraActual
     })
-    .then(() => {
-      volcarDatos(compraActual)
+    .then(compra => {
+      volcarDatos(compra)
+      return compra.ListaProductosComprados
     })
-    .then(() => {
-      volcarProductos(compraActual.ListaProductosComprados)
-      listarParaModificacion(listaProductos, compraActual.Proveedor, compraActual.ListaProductosComprados[0].Producto)
+    .then(prodCompras => {
+      console.log(prodCompras)
     })
     .catch(err => {
       console.error(err)
     })
 }
+
+async function volcarDatos(compra) {
+  try {
+    listaProveedores.contains(compra.Proveedor) ? listaProveedores.value = compra.Proveedor : toastr.error('El proveedor de la compra: "' + compraActual.Proveedor + '" no fue encontrado en la base de datos')
+    comprobante.value = compra.TipoComprobante
+    await listaProveedores.dispatchEvent(new Event('change'))
+    await comprobante.dispatchEvent(new Event('change'))
+  } catch (err) {
+    console.error(err)
+  }
+  document.getElementById('razonSocial').value = compra.RazonSocial
+  document.getElementById('condicion').value = compra.CondicionFiscal
+  document.getElementById('tipo').value = compra.TipoProveedor
+  document.getElementById('numFc').value = compra.NumeroFactura
+  fechaFc.value = compra.FechaFactura
+  montoTotal.value = compra.MontoTotal
+  ivaTotal.value = compra.MontoTotalIVA
+  document.getElementById('cuit').value = compra.Cuit
+  document.getElementById('observaciones').value = compra.Observaciones
+  // await agregarProductos(compra.ListaProductosComprados)
+}
+
+// async function agregarProductos(productos) {
+//       limpiarFilasProductos(filaProducto)
+
+//       listaProveedores.dispatchEvent(new Event('change'))
+//       volcarDatos(compraActual)
+//     })
+//     .then(() => {
+//       volcarProductos(compraActual.ListaProductosComprados)
+//       listarParaModificacion(compraActual.Proveedor)
+//     })
+//     .catch(err => {
+//       console.error(err)
+//     })
+// }
 
 HTMLSelectElement.prototype.contains = function (value) {
   for (let i = 0, l = this.options.length; i < l; i++) {
@@ -608,41 +612,71 @@ HTMLSelectElement.prototype.contains = function (value) {
   return false;
 }
 
-function volcarDatos(compra) {
-  (listaProveedores.contains(compra.Proveedor)) ? listaProveedores.value = compra.Proveedor: toastr.error('El proveedor de la compra: "' + compra.Proveedor + '" no fue encontrado en la base de datos')
-  document.getElementById('razonSocial').value = compra.RazonSocial
-  document.getElementById('condicion').value = compra.CondicionFiscal
-  document.getElementById('tipo').value = compra.TipoProveedor
-  document.getElementById('numFc').value = compra.NumeroFactura
-  fechaFc.value = compra.FechaFactura
-  montoTotal.value = compra.MontoTotal
-  ivaTotal.value = compra.MontoTotalIVA
-  document.getElementById('cuit').value = compra.Cuit
-  document.getElementById('observaciones').value = compra.Observaciones
-}
+//   function volcarDatos(compra) {
+//   document.getElementById('razonSocial').value = compra.RazonSocial
+//   document.getElementById('condicion').value = compra.CondicionFiscal
+//   document.getElementById('tipo').value = compra.TipoProveedor
+//   document.getElementById('numFc').value = compra.NumeroFactura
+//   fechaFc.value = compra.FechaFactura
+//   montoTotal.value = compra.MontoTotal
+//   ivaTotal.value = compra.MontoTotalIVA
+//   document.getElementById('cuit').value = compra.Cuit
+//   document.getElementById('observaciones').value = compra.Observaciones
+// }
 
-function volcarProductos(productos) {
-  for (let i = 0; i < productos.length; i++) {
-    let productoActual = productos[i]
-    if (i > 0) {
-      addProduct()
-      document.getElementById('listaProductos' + i).value = productoActual.Producto
-      document.getElementById('marca' + i).value = productoActual.Marca
-      document.getElementById('precio' + i).value = productoActual.Precio
-      document.getElementById('cantidad' + i).value = productoActual.Cantidad
-      document.getElementById('subtotal' + i).value = productoActual.Subtotal
-      document.getElementById('iva' + i).value = productoActual.PorcentajeIVA
-      document.getElementById('ivaPesos' + i).value = productoActual.MontoIVA
-      document.getElementById('precioBruto' + i).value = productoActual.PrecioBruto
-    } else {
-      listaProductos.value = productoActual.Producto
-      marca.value = productoActual.Marca
-      precio.value = productoActual.Precio
-      cantidad.value = productoActual.Cantidad
-      subtotal.value = productoActual.Subtotal
-      iva.value = productoActual.PorcentajeIVA
-      ivaPesos.value = productoActual.MontoIVA
-      precioBruto.value = productoActual.PrecioBruto
-    }
-  }
-}
+// function volcarProductos(productos) {
+//   for (let i = 0; i < productos.length; i++) {
+//     let productoActual = productos[i]
+//     if (i > 0) {
+//       addProduct()
+//       document.getElementById('marca' + i).value = productoActual.Marca
+//       document.getElementById('precio' + i).value = productoActual.Precio
+//       document.getElementById('cantidad' + i).value = productoActual.Cantidad
+//       document.getElementById('subtotal' + i).value = productoActual.Subtotal
+//       document.getElementById('iva' + i).value = productoActual.PorcentajeIVA
+//       document.getElementById('ivaPesos' + i).value = productoActual.MontoIVA
+//       document.getElementById('precioBruto' + i).value = productoActual.PrecioBruto
+//     } else {
+//       marca.value = productoActual.Marca
+//       precio.value = productoActual.Precio
+//       cantidad.value = productoActual.Cantidad
+//       subtotal.value = productoActual.Subtotal
+//       iva.value = productoActual.PorcentajeIVA
+//       ivaPesos.value = productoActual.MontoIVA
+//       precioBruto.value = productoActual.PrecioBruto
+//     }
+//   }
+// }
+
+// async function listarParaModificacion(nombreProveedor) {
+//   $('#listaProductos').empty()
+//   let datos = []
+//   let aux
+//   await db.collection('productos').where('Proveedor', "==", nombreProveedor)
+//     .get()
+//     .then(querysnapshot => {
+//       querysnapshot.forEach(doc => {
+//         const producto = doc.data()
+//         producto.ProductoId = doc.id
+//         datos.push(producto)
+//       })
+//     })
+//     .then(() => {
+//       datos.forEach(producto => {
+//         console.log(datos)
+//         let lista = document.getElementById('listaProductos' + aux)
+//         if (aux = 0) {
+//           listaProductos.value = producto.Nombre
+//           listaProductos.removeAttribute('disabled')
+//         } else {
+//           lista.value = producto.Nombre
+//           lista.removeAttribute('disabled')
+//         }
+//         aux++
+
+//       })
+//     })
+//     .catch(err => {
+//       console.error(err);
+//     })
+// }
