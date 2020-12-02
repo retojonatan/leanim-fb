@@ -125,7 +125,7 @@ function uploadTable() {
             "data": "ClienteId",
             "data": "Nombre",
             "data": function (data, type, row) {
-              return `<a href="./panelClientes.html" class="btn btn-sm btn-info">Acceder <i class="fa fa-user-cog"></i></a>
+              return `<a href="./panelClientes/${data.ClienteId}" class="btn btn-sm btn-info">Acceder <i class="fa fa-user-cog"></i></a>
             <a class="btn btn-sm btn-warning" href="#" onclick="mostrarCliente('${data.ClienteId}')">Editar <i class="fa fa-edit" ></i></a>
             <a class="btn btn-sm btn-danger" href="#" onclick="preguntaBorrar('${data.ClienteId}', '${data.Nombre}')">Borrar <i class="far fa-trash-alt" ></i></a>`;
             }
