@@ -24,4 +24,4 @@ window.onload = function (e) {
   if (window.screen.width <= 1400) {
     document.body.className = "sidebar-mini layout-fixed sidebar-collapse";
   }
-};
+}

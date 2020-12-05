@@ -12,7 +12,6 @@ const app = express()
 app.engine('hbs', engines.handlebars)
 app.set('views', './views')
 app.set('view engine', 'hbs')
-app.use(express.static('./js'));
 
 app.get('/panelClientes/:id', (req, res) => {
   db.collection('clientes')
@@ -21,7 +20,6 @@ app.get('/panelClientes/:id', (req, res) => {
     .then(doc => {
       let clienteData = doc.data()
       clienteData.Id = req.params.id
-      clienteData.CtaCte = clienteData.Haber - clienteData.Debe
       return res.render('panelClientes', {
         clienteData
       })
@@ -60,5 +58,7 @@ app.get('/clientes', (req, res) => {
 app.get('/Login', (req, res) => {
   return res.render('login')
 })
+
+
 
 exports.app = functions.https.onRequest(app)

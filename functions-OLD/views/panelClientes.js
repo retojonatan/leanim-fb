@@ -53,6 +53,7 @@ function agregarMercaderia() {
     clon.getElementsByTagName('select')[0].addEventListener('change', function (e) {
       var opcionElegida = e.target.options.selectedIndex;
       var productoId = e.srcElement[opcionElegida].getAttribute('data-id')
+      console.log(clon.getElementsByTagName('select')[0].value, clon.getElementsByTagName('select')[1], productoId)
       filtrarPeso(clon.getElementsByTagName('select')[0].value, clon.getElementsByTagName('select')[1], productoId)
     })
   }

@@ -8,6 +8,8 @@ let subtotal = document.getElementById('subtotal');
 let precioTotal = document.getElementById('precioTotal');
 let formMercaderia = document.getElementById('formMercaderia');
 let ctaCte = document.getElementById('ctacte').innerHTML;
+let clienteId = document.getElementById('clienteId').innerText;
+let nombreCliente = document.getElementById('nombreCliente').innerText;
 let count = 1
 
 // fecha de venta
@@ -32,7 +34,7 @@ if (ctaCte > 0) {
 $(window).on("load", () => {
   uploadTable()
   listarMercaderia()
-  listaMercaderia.addEventListener('change', () => filtrarPeso(listaMercaderia.value, tipoPeso, listaMercaderia.selectedOptions[0].getAttribute('data-id')));
+  listaMercaderia.addEventListener('change', () => filtrarPeso(tipoPeso, listaMercaderia.selectedOptions[0].getAttribute('data-id')));
   tipoPeso.addEventListener('change', () => ponerPesoMaximo(tipoPeso.value));
   peso.addEventListener('change', () => categorizarPeso(peso.value));
   cantidad.addEventListener('change', () => actualizarTotal());
@@ -51,7 +53,7 @@ function agregarMercaderia() {
     clon.getElementsByTagName('select')[0].addEventListener('change', function (e) {
       var opcionElegida = e.target.options.selectedIndex;
       var productoId = e.srcElement[opcionElegida].getAttribute('data-id')
-      filtrarPeso(clon.getElementsByTagName('select')[0].value, clon.getElementsByTagName('select')[1], productoId)
+      filtrarPeso(clon.getElementsByTagName('select')[1], productoId)
     })
   }
   for (var i = 0; i < clon.getElementsByTagName('input').length; i++) {
@@ -87,11 +89,11 @@ function listarMercaderia() {
     })
 }
 
-function filtrarPeso(mercaderia, listaPeso, id) {
+function filtrarPeso(listaPeso, id) {
   db.collection('mercaderia').doc(id)
     .get()
     .then(doc => {
-      limpiarListaPeso()
+      limpiarListaPeso(listaPeso)
       let filtros = doc.data().Categoria
       filtros.forEach(cat => {
         let option = document.createElement('option')
@@ -99,57 +101,46 @@ function filtrarPeso(mercaderia, listaPeso, id) {
         switch (cat) {
           case "A":
             option.appendChild(document.createTextNode('A - hasta 20kg'));
+            option.setAttribute('min', 0)
+            precioLista.value = precioPorKilo.value = doc.data().PrecioLista
             break;
           case "B":
             option.appendChild(document.createTextNode('B - entre 20 a 30kg'));
+            option.setAttribute('min', 0)
             break;
           case "C":
             option.appendChild(document.createTextNode('C - entre 30 a 40kg'));
+            option.setAttribute('min', 0)
             break;
           case "D":
             option.appendChild(document.createTextNode('D - entre 40 a 50kg'));
+            option.setAttribute('min', 0)
             break;
           case "E":
             option.appendChild(document.createTextNode('E - entre 50 y 70kg'));
+            option.setAttribute('min', 0)
             break;
           case "F":
             option.appendChild(document.createTextNode('F - entre 70 a 100kg'));
+            option.setAttribute('min', 0)
             break;
           default:
             option.appendChild(document.createTextNode('G - más de 100kg'));
+            option.setAttribute('min', 0)
             break;
         }
         listaPeso.appendChild(option);
       })
-      switch (mercaderia) {
-        case "Lechón":
-          peso.min = 0;
-          peso.max = 50;
-          break;
-        case "Capón":
-          peso.min = 50;
-          break;
-        case "Ternero":
-          peso.min = 0;
-          peso.max = 40;
-          break;
-        default:
-          peso.min = 0;
-          peso.max = 20;
-          break;
-      }
-      precioLista.value = precioPorKilo.value = doc.data().PrecioLista
     })
 }
 
-function limpiarListaPeso() {
-  $(tipoPeso).empty();
+function limpiarListaPeso(lista) {
+  $(lista).empty();
   var option = document.createElement('option');
   option.setAttribute('selected', 'selected');
   option.setAttribute('hidden', 'hidden');
   option.setAttribute('disabled', 'disabled');
-  tipoPeso.appendChild(option)
-  peso.value = ""
+  lista.appendChild(option)
 }
 
 //FALTA EL CLIENTE
@@ -157,7 +148,7 @@ function altaMercaderia(e) {
   e.preventDefault();
   var jsonVentas = {
     Fecha: hoy,
-    NumeroRemito: yyyy + count,
+    NumeroRemito: yyyy + '' + count,
     Mercaderia: listaMercaderia.value,
     TipoPeso: tipoPeso.value,
     Peso: peso.value,
@@ -165,8 +156,7 @@ function altaMercaderia(e) {
     Cantidad: cantidad.value,
     Subtotal: subtotal.value,
     MontoTotal: precioTotal.value,
-    // Cliente: nombreCliente.value
-    Cliente: 'matias'
+    Cliente: nombreCliente.value
   }
 
   db.collection('ventas').doc().set(jsonVentas)

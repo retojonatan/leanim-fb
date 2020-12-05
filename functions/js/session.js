@@ -12,8 +12,8 @@ document.onreadystatechange = function (e) {
         break;
       default:
         auth.signOut().then(() => {
-          console.log('logout y redirect por rol')
-          // window.location.href = "./Login";
+          console.warn('logout y redirect por rol')
+          if (!window.location.href.includes("/Login")) window.location.href = "./Login";
         })
         break;
     }

@@ -15,6 +15,10 @@
         "function": "app"
       }
     ],
+    "redirect": [{
+      "source": "**/js",
+      "destination": "/public"
+    }],
     "ignore": [
       "firebase.json",
       "**/.*",
