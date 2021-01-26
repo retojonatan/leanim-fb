@@ -19,7 +19,8 @@ function registrarCliente() {
     Haber: 0,
     Debe: 0,
     ComprasAcumuladas: 0,
-    VentasId: []
+    RemitosVentas: [],
+    NumerosPagos: [],
   }
 
   db.collection('clientes').doc().set(jsonCliente)

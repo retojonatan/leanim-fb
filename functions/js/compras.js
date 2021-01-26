@@ -70,10 +70,6 @@ function addProduct() {
   });
   document.getElementById(cantidadProd.toString()).value = 1;
   count++;
-  listaProductos.setAttribute('disabled', 'disabled');
-  for (let i = 1; i < count - 1; i++) {
-    document.getElementById('listaProductos' + i).setAttribute('disabled', 'disabled');
-  }
   document.getElementById('borrarProducto').style.display = "inline-block";
 }
 
@@ -560,7 +556,7 @@ function mostrarCompra(id) {
       while (count != 1) {
         deleteProduct()
       }
-      let result = await combo(compraActual)
+      let result = await cargarTareas(compraActual)
       return result
     })
     .then(compra => {
@@ -571,6 +567,7 @@ function mostrarCompra(id) {
     })
     .then(() => {
       cambiarBtn()
+      toastr.success("Ya puede modificar la compra", "AVISO:")
     })
     .catch(err => {
       console.error(err)
@@ -599,6 +596,10 @@ function reiniciarBtn() {
   btncancel.innerHTML = 'Cancelar'
   btncancel.removeAttribute('onclick', 'reiniciarBtn()')
   btncancel.classList.replace('btn-secondary', 'btn-default')
+  while (count != 1) {
+    deleteProduct()
+  }
+  toastr.info('Ya puede cargar una nueva compra', 'AVISO:')
 }
 
 function volcarDatos(compra) {
@@ -620,7 +621,7 @@ function volcarDatos(compra) {
   }
 }
 
-async function combo(compra) {
+async function cargarTareas(compra) {
   listaProveedores.contains(compra.Proveedor) ? listaProveedores.value = compra.Proveedor : toastr.error('El proveedor de la compra: "' + compraActual.Proveedor + '" no fue encontrado en la base de datos')
   presentarDatosProveedor(listaProveedores.selectedOptions[0].getAttribute('data-id'))
   await listarProductos(listaProductos, listaProveedores.value)
@@ -639,7 +640,7 @@ function agregarProductos(productos) {
       iva.value = productoActual.PorcentajeIVA
       ivaPesos.value = productoActual.MontoIVA
       precioBruto.value = productoActual.PrecioBruto
-      listaProductos.value = productoActual.Producto
+      listaProductos.contains(productoActual.Producto) ? listaProductos.value = productoActual.Producto : toastr.error('El producto: "' + productoActual.Producto + '" no fue encontrado en la base de datos', 'AVISO IMPORTANTE:')
     } else {
       addProduct()
       document.getElementById('marca' + i).value = productoActual.Marca
@@ -649,7 +650,7 @@ function agregarProductos(productos) {
       document.getElementById('iva' + i).value = productoActual.PorcentajeIVA
       document.getElementById('ivaPesos' + i).value = productoActual.MontoIVA
       document.getElementById('precioBruto' + i).value = productoActual.PrecioBruto
-      document.getElementById('listaProductos' + i).value = productoActual.Producto
+      document.getElementById('listaProductos' + i).contains(productoActual.Producto) ? document.getElementById('listaProductos' + i).value = productoActual.Producto : toastr.error('El producto: "' + productoActual.Producto + '" no fue encontrado en la base de datos', 'AVISO IMPORTANTE:')
     }
   }
 }

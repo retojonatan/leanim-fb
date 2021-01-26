@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 
 <head>
   <meta charset="utf-8">
@@ -115,7 +115,7 @@
                 </li>
 
                 <li class="nav-item">
-                  <a href="../panelClientes" class="nav-link active">
+                  <a href="#" class="nav-link active">
                     <i class="far fa-user nav-icon"></i>
                     <p>Panel Cliente</p>
                   </a>
@@ -202,7 +202,8 @@
                 <span class="info-box-icon"><i class="ion ion-ios-pricetag-outline"></i></span>
                 <div class="info-box-content">
                   <span class="info-box-text">Compras ACUMULADAS</span>
-                  <span class="info-box-number"><span>{{clienteData.ComprasAcumuladas}}</span> $</span>
+                  <span class="info-box-number"><span id="comprasAcumuladas">{{clienteData.ComprasAcumuladas}}</span>
+                    $</span>
                 </div>
                 <!-- /.info-box-content -->
               </div>
@@ -225,7 +226,7 @@
                 <span class="info-box-icon"><i class="ion-cash"></i></span>
                 <div class="info-box-content">
                   <span class="info-box-text">
-                    <a href="#" class="btn btn-sm btn-outline-light">INGRESAR PAGOS</a>
+                    <a onclick="$('#modalPagos').modal('show');" class="btn btn-sm btn-outline-light">INGRESAR PAGOS</a>
                   </span>
                 </div>
                 <!-- /.info-box-content -->
@@ -266,13 +267,6 @@
                         <label>Tipo de mercadería</label>
                         <select type="text" class="form-control" id="tipoPeso" required>
                           <option disabled selected hidden></option>
-                          <option value="A">A - hasta 20kg</option>
-                          <option value="B">B - entre 20 a 30kg</option>
-                          <option value="C">C - entre 30 a 40kg</option>
-                          <option value="D">D - entre 40 a 50kg</option>
-                          <option value="E">E - entre 50 y 70kg</option>
-                          <option value="F">F - entre 70 a 100kg</option>
-                          <option value="G">G - más de 100kg</option>
                         </select>
                       </div>
                     </div>
@@ -281,7 +275,8 @@
                       <div class="form-group">
                         <label>Peso kg</label>
                         <div class="input-group">
-                          <input type="number" step="0.001" class="form-control" min="1" id="peso">
+                          <input type="number" step="0.001" class="form-control" min="1" onfocus="this.value=''"
+                            id="peso">
                           <div class="input-group-append">
                             <span class="input-group-text">Kg</span>
                           </div>
@@ -305,7 +300,8 @@
                       <div class="form-group">
                         <label>Precio/Kg</label>
                         <div class="input-group">
-                          <input type="number" class="form-control" id="precioKilo" min="1">
+                          <input type="number" class="form-control" id="precioKilo" min="1" step="any"
+                            onfocus="this.value=''">
                           <div class="input-group-append">
                             <span class="input-group-text">$</span>
                           </div>
@@ -336,7 +332,8 @@
                       <div class="form-group">
                         <label>Precio total</label>
                         <div class="input-group">
-                          <input type="number" step="0.01" class="form-control" id="precioTotal" min="1" required>
+                          <input type="number" step="0.01" class="form-control" id="precioTotal" min="1"
+                            onfocus="this.value=''" name="total" required>
                           <div class="input-group-append">
                             <span class="input-group-text">$</span>
                           </div>
@@ -352,19 +349,26 @@
                   <button type="button" onclick="borrarMercaderia()" class="btn btn-danger" id="borrarProducto"
                     style="display: none;"><i class="fa fa-minus"> </i> Eliminar
                     mercadería</button>
-
-                  <div class="col-2 float-right" hidden>
-                    <label for="metodo">Método de Pago</label>
-                    <select type="text" class="form-control" id="metodo">
-                      <option>Efectivo</option>
-                      <option>Cheque</option>
-                      <option>Cuenta Corriente</option>
-                      <option>Tarjeta de Débito/Crédito</option>
-                    </select>
-                  </div>
                 </div>
-                <hr>
-                <div class="float-right">
+                <div class="float-right text-right">
+                  <span class="ml-3 px-1">Precio Total:</span><span class="px-4 font-weight-bold" id="totalVenta">0
+                    $</span>
+                  <hr>
+                  <span class="px-1">Forma de Pago:</span>
+                  <input id="f-ef" value="forma-efectivo" data-forma="efectivo" class="ml-3" type="radio" name="forma"
+                    checked required>
+                  <label for="f-ef">Efectivo</label>
+                  <input id='f-cta' value="forma-cuenta" data-forma="cuenta corriente" class="ml-3" type="radio"
+                    name="forma">
+                  <label for="f-cta">Cuenta Corriente</label>
+                  <input id="f-ch" value="forma-cheque" data-forma="cheque" class="ml-3" type="radio" name="forma">
+                  <label for='f-ch'>Cheque</label>
+                  <input id="f-tr" value="forma-transferencia" data-forma="transferencia" class="ml-3" type="radio"
+                    name="forma">
+                  <label for="f-tr">Transferencia</label>
+                  <br>
+                  <div class="row" id="datosExtras"></div>
+                  <hr>
                   <button type="submit" class="btn font-weight-bold bg-info mr-3">INGRESAR VENTA</button>
                   <button type="reset" class="btn btn-default">Cancelar</button>
                 </div>
@@ -390,7 +394,7 @@
                   <table class="table table-head-fixed text-nowrap" id="tablaVentas">
                     <thead>
                       <tr>
-                        <th style="width: 80px">Fecha</th>
+                        <th style="width: 60px">Fecha</th>
                         <th style="width: 100px">Nº de Factura</th>
                         <th style="width: 120px">Monto Total</th>
                         <th style="width: 80px">Panel Venta</th>
@@ -398,7 +402,7 @@
                     </thead>
                     <tfoot>
                       <tr>
-                        <th style="width: 80px">Fecha</th>
+                        <th style="width: 60px">Fecha</th>
                         <th style="width: 100px">Nº de Factura</th>
                         <th style="width: 120px">Monto Total</th>
                         <th style="width: 80px">Panel Venta</th>
@@ -427,18 +431,20 @@
                   <table class="table table-head-fixed text-nowrap" id="tablaPagos">
                     <thead>
                       <tr>
-                        <th style="width: 80px">Fecha</th>
-                        <th style="width: 100px">Nº de Pago</th>
-                        <th style="width: 120px">Monto Total</th>
-                        <th style="width: 80px">Panel Pagos</th>
+                        <th style="width: 60px">Fecha</th>
+                        <th>Nº de Pago</th>
+                        <th>Importe</th>
+                        <th>Metodo</th>
+                        <th>Panel Pagos</th>
                       </tr>
                     </thead>
                     <tfoot>
                       <tr>
-                        <th style="width: 80px">Fecha</th>
-                        <th style="width: 100px">Nº de Pago</th>
-                        <th style="width: 120px">Monto Total</th>
-                        <th style="width: 80px">Panel Pagos</th>
+                        <th style="width: 60px">Fecha</th>
+                        <th>Nº de Pago</th>
+                        <th>Importe</th>
+                        <th>Metodo</th>
+                        <th>Panel Pagos</th>
                       </tr>
                     </tfoot>
                   </table>
@@ -455,7 +461,6 @@
   </div>
   <!-- ./wrapper -->
 
-  <!-- 
   <div class="modal fade" id="modalPagos" tabindex="-1" role="dialog" aria-labelledby="modalPagos" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered " role="document">
       <div class="modal-content">
@@ -465,18 +470,39 @@
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body">
-          
-          <form role="form">
+        <form role="form" id="formPagos">
+          <div class="modal-body">
             <div class="card-body">
               <div class="form-group">
                 <label for="metodo">Método de Pago</label>
-                <select type="text" class="form-control" id="metodo" placeholder="Cliente">
-                  <option>Efectivo</option>
-                  <option>Cheque</option>
-                  <option>Cuenta Corriente</option>
-                  <option>Tarjeta de Débito/Crédito</option>
+                <select type="text" class="form-control" id="metodo" placeholder="Cliente" required name="metodo">
+                  <option value='efectivo'>Efectivo</option>
+                  <option value='cheque'>Cheque</option>
+                  <option value='transferencia'>Transferencia</option>
                 </select>
+              </div>
+              <div class="form-group" id="fechaForm" hidden>
+                <label for="fecha">Fecha del cobro</label>
+                <input type="date" id="fechaCobro" class="form-control datetimepicker-input" data-target="#timepicker"
+                  name="fecha">
+              </div>
+              <div class="form-group" id="cheque" hidden>
+                <label for="numeroCheque">Numero de Cheque</label>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">Nº</span>
+                  </div>
+                  <input type="text" class="form-control" id="numeroCheque" name="numeroCheque">
+                </div>
+              </div>
+              <div class="form-group" id="transferencia" hidden>
+                <label for="numeroTransferencia">Numero de Transferencia</label>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">Nº</span>
+                  </div>
+                  <input type="text" class="form-control" id="numeroTransferencia" name="numeroTransferencia">
+                </div>
               </div>
               <div class="form-group">
                 <label for="importe">Importe</label>
@@ -484,38 +510,25 @@
                   <div class="input-group-prepend">
                     <span class="input-group-text">$</span>
                   </div>
-                  <input type="number" class="form-control" id="importe" placeholder="Importe" min="0">
+                  <input type="number" step="any" class="form-control" id="importe" placeholder="Importe" min="0"
+                    name="importe" required>
                 </div>
               </div>
               <div class="form-group">
-                <label for="metodo">Remitos Pendientes</label>
-                <select type="text" class="form-control" id="metodo" placeholder="Cliente">
-                  <option>Remito 1</option>
-                  <option>Remito 2</option>
-                  <option>Remito 3</option>
-                  <option>Remito 4</option>
-                  <option>Remito 5</option>
-                  <option>Remito 6</option>
-                  <option>Remito 7</option>
-                  <option>Remito 8</option>
-                </select>
-                ESTE SPAN TIENE QUE TRAER EL MONTO DEL REMITO, ESTAR ESCONDIDO MIENTRAS NO ELIJAN REMITO
-                <p class="text-right">Monto Adeudado: <span id="monto">45000</span> $</p>
-              </div>
-              <div class="form-group">
-                <label for="concepto">Observaciones</label>
-                <input type="text" class="form-control" id="concepto" placeholder="Detalle del pago">
+                <label for="observaciones">Observaciones</label>
+                <input type="text" name="observaciones" class="form-control" id="observaciones"
+                  placeholder="Detalle del pago">
               </div>
             </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-info">INGRESAR PAGO</button>
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-        </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-info">INGRESAR PAGO</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+          </div>
+        </form>
       </div>
     </div>
-  </div> Modal Pagos -->
+  </div>
 
   <!-- Modal -->
   <div class="modal fade" id="modalBorrar" tabindex="-1" role="dialog" aria-labelledby="modalDel" aria-hidden="true">
